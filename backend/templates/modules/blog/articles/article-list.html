@@ -7,5 +7,6 @@
 		</figure>
 		<strong>{{ article.title }}</strong>
 		<p>{{ article.short_description }}</p>
+		<a href="{{ article.get_absolute_url }}">Подробнее</a>
 	{% endfor %}
 {% endblock %}

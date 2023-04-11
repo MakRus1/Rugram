@@ -4,6 +4,8 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 from pytils.translit import slugify
 from modules.system.services.utils import ImageDirectorySave
+from modules.system.services.utils import unique_slugify
+from django.urls import reverse
 
 class Article(models.Model):
 	# Модель статей
@@ -12,12 +14,8 @@ class Article(models.Model):
 	category = TreeForeignKey('Category', on_delete=models.PROTECT, related_name='articles', verbose_name='Категория')
 	short_description = models.TextField(verbose_name='Краткое описание', max_length=300)
 	full_description = models.TextField(verbose_name='Описание')
-	author = models.ForeignKey(User, verbose_name='Автор материала', on_delete=models.PROTECT, related_name='article_author') 
-	updated_by = models.ForeignKey(User, verbose_name='Автор обновления', on_delete=models.CASCADE, related_name='article_updated_by', blank=True, null=True) 
+	author = models.ForeignKey(User, verbose_name='Автор', on_delete=models.PROTECT, related_name='article_author') 
 	created_at = models.DateTimeField(verbose_name='Дата добавления', auto_now_add=True, db_index=True)
-	updated_at = models.DateTimeField(verbose_name='Дата обновления', auto_now=True, db_index=True)
-	reason = models.CharField(verbose_name='Причина обновления', max_length=100, blank=True)
-	is_fixed = models.BooleanField(verbose_name='Зафиксировано', default=False, db_index=True)
 	is_published = models.BooleanField(verbose_name='Опубликовано', default=True)
 	thumbnail = models.ImageField(
 		verbose_name='Превью поста',
@@ -30,10 +28,10 @@ class Article(models.Model):
 
 	class Meta:
 		# Сортировка и отображение
-		ordering = ('-is_fixed', '-created_at')
-		verbose_name = 'Статья'
-		verbose_name_plural = 'Статьи'
-		db_table = 'app_articles'
+		ordering = ('-created_at',)
+		verbose_name = 'Пост'
+		verbose_name_plural = 'Посты'
+		db_table = 'app_posts'
 
 	def __str__(self):
 		# Строковое представление
@@ -42,10 +40,15 @@ class Article(models.Model):
 	@property
 	def get_thumbnail(self):
 		# Получение заглушки при отсутствии изображения
+		if not self.thumbnail:
+			return '/media/images/placeholder.png'
 		return self.thumbnail.url
 	
 	def save(self, *args, **kwargs):
 		# Сохранение незаполненных полей
 		if not self.slug:
-			self.slug = slugify(self.title)
+			self.slug = unique_slugify(self, self.title)
 		super().save(*args, **kwargs)
+
+	def get_absolute_url(self):
+		return reverse('article-detail', kwargs={'slug': self.slug})

@@ -1,3 +1,3 @@
-from modules.blog.views.articles import article_list
+from modules.blog.views.articles import ArticleListView
 
-__all__ = ('article_list')
+__all__ = ('ArticleListView')

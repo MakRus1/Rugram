@@ -1,0 +1,26 @@
+{% extends 'main.html' %}
+
+{% block content %}
+	<div class="card border-0">
+		<div class="card-body">
+			<div class="row">
+				<div class="col-md-4">
+					<figure>
+						<img src="{{ article.get_thumbnail }}" width="200" alt="{{ article.title }}">
+					</figure>
+				</div>
+				<div class="col-md-8">
+					<h5 class="catd-title">
+						{{ article.title }}
+					</h5>
+					<small class='card-subtitle'>
+						{{ article.created_at }} / {{ article.category }}
+					</small>
+					<div class="card-text">
+						{{ article.full_description }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

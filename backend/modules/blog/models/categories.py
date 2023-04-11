@@ -35,5 +35,5 @@ class Category(MPTTModel):
 	def save(self, *args, **kwargs):
 		# Сохранение незаполненных полей
 		if not self.slug:
-			self.slug = slugify(self.title)
+			self.slug = unique_slugify(self, self.title)
 		super().save(*args, **kwargs)
